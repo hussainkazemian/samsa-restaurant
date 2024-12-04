@@ -13,6 +13,8 @@ const authRoutes = require("./routes/auth");
 const reservationRoutes = require('./routes/reservation');
 const passwordRoutes = require('./routes/password');
 
+const fetchUserData = require("./shared/fetchUserData");
+
 const secret = crypto.randomBytes(64).toString('hex');
 console.log('Generated Secret Key:', secret); 
 
@@ -38,6 +40,8 @@ app.set('view engine', 'ejs');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use("/libs", express.static("node_modules"));
 app.use("/static", express.static("public"));
+
+app.use(fetchUserData);
 
 // Register routes
 app.use(authRoutes);

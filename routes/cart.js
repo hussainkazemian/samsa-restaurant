@@ -14,28 +14,34 @@ function checkCart(req, res, next) {
 router.use(checkCart);
 
 // GET /cart - Display the shopping cart
-router.get('/', async (req, res) => {
+// GET /cart - Display the shopping cart
+router.get("/", async (req, res) => {
     let cartItems = [];
     let totalPrice = 0;
 
     try {
         if (req.session.user) {
-            // Fetch cart items from the database if the user is logged in
-            const [dbCartItems] = await db.execute("SELECT * FROM cart_items WHERE user_id = ?", [req.session.user.id]);
+            // Fetch cart items for logged-in users
+            const [dbCartItems] = await db.execute(
+                "SELECT product_id, product_name, quantity, total_price FROM cart_items WHERE user_id = ?",
+                [req.session.user.id]
+            );
             cartItems = dbCartItems.map(item => ({
                 ...item,
-                total_price: parseFloat(item.total_price), // Ensure total_price is a number
+                total_price: parseFloat(item.total_price), // Ensure total_price is numeric
             }));
             totalPrice = cartItems.reduce((sum, item) => sum + item.total_price, 0);
         } else {
             // Use session cart for non-logged-in users
-            cartItems = req.session.cart;
+            cartItems = req.session.cart || [];
             totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
         }
 
-        res.render('cart/cart', {
+        // Pass reservations dynamically fetched via middleware (fetchUserData)
+        res.render("cart/cart", {
             user: req.session.user || null,
             items: cartItems,
+            reservations: req.reservations || [], // Include reservations in the cart view
             totalPrice,
         });
     } catch (error) {
@@ -43,6 +49,7 @@ router.get('/', async (req, res) => {
         res.status(500).send("An error occurred while loading the cart.");
     }
 });
+
 
 // POST /cart/add - Add item to the cart
 router.post('/add', async (req, res) => {

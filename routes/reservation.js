@@ -2,14 +2,14 @@ const express = require("express");
 const db = require("../data/db");
 const router = express.Router();
 
-// Render reservation form
 router.get("/", (req, res) => {
-    const user = req.session.user || null; // Safely access session
     res.render("reservation/reservation", {
-        user,
+        user: req.session.user || null,
         title: "Reservation",
+        reservations: req.reservations || [], // Dynamically fetched reservations
     });
 });
+
 
 // Handle reservation submission
 router.post("/", async (req, res) => {
