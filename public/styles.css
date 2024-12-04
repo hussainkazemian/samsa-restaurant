@@ -77,12 +77,14 @@ body {
 }
 
 .container {
-    width: 80%;
-    margin: 20px auto;
-    background: #8ecda1;
+     /* width: 80%; */
+    /* margin: 20px auto; */
     padding: 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    /* border-radius: 5px; */
+    /* box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); */
+    margin-bottom: 468px;
+    
+
 }
 
 h1 {
@@ -97,4 +99,33 @@ nav ul {
 nav ul li {
     display: inline;
     margin-right: 10px;
+}
+.bg-primary {
+    background-image: url(/public/images/hero.jpg);
+    padding: 20px;
+    height: 600px;
+    background: rgba(55, 0, 3, 0.675);
+    background-image:url("./images/hero.jpg") ;
+    background-size:cover;
+
+    background-repeat: no-repeat;
+    background-position:center;
+    display: flex;
+}
+
+.navbar-nav , .navbar, .nav-link  {
+    display: flex; /* Ensure the nav-items are flex children */
+    justify-content: space-between; /* Distribute links */
+    align-items: center; /* Vertically align */
+    gap: 15px; /* Space between items */
+    width: 100%; /* Fill the width */
+    padding: 10px 15px; /* Padding for touch-friendly links */
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    color: #ffffff;
+
+}
+.navbar-collapse {
+    justify-content: space-around; /* Center collapsed links */
+    gap: 10px; /* Space between links in collapsed mode */
 }

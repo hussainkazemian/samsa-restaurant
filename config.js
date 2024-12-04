@@ -1,8 +1,8 @@
 const config = {
     db: {
         host: "localhost",
-        user: "root",
-        password: "Dimayman1",
+        user: "admin",
+        password: "admin",
         database: "samsa_restaurant_app"
     },
    

@@ -10,6 +10,9 @@ const cartRoutes = require("./routes/cart");
 const userRoutes = require("./routes/user");
 const adminRoutes = require("./routes/admin");
 const authRoutes = require("./routes/auth");
+const reservationRoutes = require('./routes/reservation');
+
+const passwordRoutes = require('./routes/password');
 
 const secret = crypto.randomBytes(64).toString('hex');
 console.log('Generated Secret Key:', secret); 
@@ -18,6 +21,8 @@ console.log('Generated Secret Key:', secret);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
+app.use(passwordRoutes);
+app.use('/reservation', reservationRoutes);
 // Set up view engine (EJS)
 app.set('views', path.join(__dirname, 'views')); // Set the 'views' folder for EJS templates
 app.set('view engine', 'ejs'); // Specify EJS as the view engine
