@@ -1,42 +1,88 @@
-<!--products.ejs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <%- include('../partials/head') %>
+    <script>
+        function showWelcomeMessage(username) {
+            alert(`Welcome back to Samsa Restaurant, ${username}!`);
+        }
+
+        function showReservationSummary(reservations) {
+            reservations.forEach(reservation => {
+                alert(`You have a reservation on Date: ${reservation.date}, Time: ${reservation.time}, Adults: ${reservation.num_adults}, Children: ${reservation.num_children || 'N/A'}.`);
+            });
+        }
+    </script>
 </head>
 <body>
-   
     <%- include('../partials/nav') %>
 
     <div class="container mt-3">
+        <h1 class="h3 mb-3"><%= title %></h1>
+
+        <!-- Summary Section -->
+        <% if ((reservations && reservations.length > 0) || (cartItems && cartItems.length > 0)) { %>
+            <div class="alert alert-info">
+                <h4>Your Summary</h4>
+
+                <% if (reservations && reservations.length > 0) { %>
+                    <p><strong>Reservations:</strong></p>
+                    <ul>
+                        <% reservations.forEach(reservation => { %>
+                            <li>
+                                <strong>Date:</strong> <%= reservation.date %>, 
+                                <strong>Time:</strong> <%= reservation.time %>, 
+                                <strong>Adults:</strong> <%= reservation.num_adults %>, 
+                                <strong>Children:</strong> <%= reservation.num_children || 'N/A' %>
+                            </li>
+                        <% }) %>
+                    </ul>
+                <% } %>
+
+                <% if (cartItems && cartItems.length > 0) { %>
+                    <p><strong>Cart Items:</strong></p>
+                    <ul>
+                        <% cartItems.forEach(item => { %>
+                            <li>
+                                <strong>Product:</strong> <%= item.name %>, 
+                                <strong>Quantity:</strong> <%= item.quantity %>, 
+                                <strong>Total:</strong> €<%= item.price * item.quantity %>
+                            </li>
+                        <% }) %>
+                    </ul>
+                <% } %>
+            </div>
+        <% } %>
+
+        <!-- Product and Menu Section -->
         <div class="row">
             <div class="col-md-3">
                 <%- include('../partials/menu-menu', { menus, selectedMenu }) %>
             </div>
             <div class="col-md-9">
-                <h1 class="h3 mb-3">
-                    <%= title %>
-                </h1>
-
-                <% if (products.length == 0) { %>
+                <% if (products.length === 0) { %>
                     <%- include('../partials/no-products') %>
+                <% } else { %>
+                    <% products.forEach(product => { %>
+                        <%- include('../partials/product-card', { product: product, isSingleProduct: false }) %>
+                    <% }) %>
                 <% } %>
-
-                <% products.forEach(product => { %>
-                    <!-- Corrected line: Pass product as an object -->
-                    <%- include('../partials/product-card', { product: product }) %>
-                <% }) %>
-
-                <!-- Pagination (optional, only if needed) -->
-                <% if (products.filter(b => b.approval).length > 3) { %>
-                    <%- include('../partials/paginations') %>
-                <% } %>
-
             </div>
         </div>
     </div>
 
-    <!-- footer -->
     <%- include('../partials/footer') %>
+
+    <!-- User-Specific Pop-Ups -->
+    <% if (user && user.username) { %>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                showWelcomeMessage("<%= user.username %>");
+                <% if (reservations && reservations.length > 0) { %>
+                    showReservationSummary(<%- JSON.stringify(reservations) %>);
+                <% } %>
+            });
+        </script>
+    <% } %>
 </body>
 </html>

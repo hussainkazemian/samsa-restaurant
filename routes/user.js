@@ -4,92 +4,88 @@ const router = express.Router();
 
 const db = require("../data/db");
 
-const { addToCart, getCart } = require("../shared/cart");// Use shared cart
-
-
 // Fetch products by menu ID
-router.use("/products/menu/:menuid", async function(req, res) {
-    const id = req.params.menuid;
+router.use("/products/menu/:menuid", async (req, res) => {
+    const { menuid } = req.params;
     try {
-        const [products, ] = await db.execute("select * from product where menuid=?", [id]);
+        const [products] = await db.execute("SELECT * FROM product WHERE menuid = ? AND approval = 1", [menuid]);
+        const [menus] = await db.execute("SELECT * FROM menu");
 
-        const [menus, ] = await db.execute("select * from menu");
-       
-        res.render("users/products",{
-            title: "All Menus",
-            products: products,
+        res.render("users/products", {
+            user: req.session.user || null,
             menus: menus,
-            selectedMenu: id
-        })
-    }
-    catch (err){
-        console.log(err);
+            products: products,
+            reservations: req.session.reservations || [],
+            cartItems: req.session.cartItems || [],
+            selectedMenu: menuid,
+            title: "Menu Products",
+        });
+    } catch (err) {
+        console.error("Error fetching products by menu:", err);
         res.status(500).send("Internal server error");
     }
 });
 
 // Fetch product details by product ID
-router.use("/products/:productid", async function (req, res) {
-    const id = req.params.productid;
+router.use("/products/:productid", async (req, res) => {
+    const { productid } = req.params;
     try {
-        const [products, ] = await db.execute("select * from product where productid=?", [id]);
-
+        const [products] = await db.execute("SELECT * FROM product WHERE productid = ?", [productid]);
         const product = products[0];
 
-        if(product){
-            return res.render("users/product-details" , {
+        if (product) {
+            return res.render("users/product-details", {
                 title: product.productname,
-                product: product
+                product: product,
+                user: req.session.user || null,
             });
         }
-        res.redirect("/"); //aradigi urun yoksa der anasayfaya don
-
-    }
-    catch (err){
-        console.log(err);
+        res.redirect("/"); // Redirect to homepage if product not found
+    } catch (err) {
+        console.error("Error fetching product details:", err);
         res.status(500).send("Internal server error");
     }
 });
 
-
 // Fetch all products
-router.use("/products", async function (req, res) {
-
+router.use("/products", async (req, res) => {
     try {
-        const [products, ] = await db.execute("select * from product where approval=1");
-        const [menus, ] = await db.execute("select * from menu");
-       
-        res.render("users/products",{
-            title: "All Menus",
-            products: products,
-            menus: menus, 
-            selectedMenu: null,
-        })
-    } 
-    catch (err) {
-        console.log(err);
-    }
+        const [products] = await db.execute("SELECT * FROM product WHERE approval = 1");
+        const [menus] = await db.execute("SELECT * FROM menu");
 
+        res.render("users/products", {
+            user: req.session.user || null,
+            menus: menus,
+            products: products,
+            reservations: req.session.reservations || [],
+            cartItems: req.session.cartItems || [],
+            selectedMenu: null,
+            title: "All Products",
+        });
+    } catch (error) {
+        console.error("Error fetching products:", error);
+        res.status(500).send("Internal server error");
+    }
 });
 
-
-// Home route - renders the home page
+// Home route
 router.get("/", async (req, res) => {
     try {
-        const [products] = await db.execute("SELECT * FROM product WHERE approval=1 AND homepage=1");
+        const [products] = await db.execute("SELECT * FROM product WHERE approval = 1 AND homepage = 1");
         const [menus] = await db.execute("SELECT * FROM menu");
 
         res.render("users/index", {
-            title: "Popular Menus",
-            products,
-            menus,
+            user: req.session.user || null,
+            menus: menus,
+            products: products,
             selectedMenu: null,
+            title: "Welcome to Samsa Restaurant",
         });
-    } catch (err) {
-        console.error(err);
+    } catch (error) {
+        console.error("Error loading home page:", error);
+        res.status(500).send("Internal server error");
     }
 });
-
 
 // Add item to cart
 router.post("/cart/add", async (req, res) => {
@@ -127,5 +123,4 @@ router.post("/cart/add", async (req, res) => {
     }
 });
 
-
-module.exports = router
+module.exports = router;
