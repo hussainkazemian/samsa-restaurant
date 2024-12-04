@@ -11,10 +11,19 @@
             }
         }
 
-        // Show reservation summaries
+        // Show reservation summaries with auto-dismiss
         function showReservationSummary(reservations) {
             reservations.forEach(reservation => {
-                alert(`You have a reservation on Date: ${reservation.date}, Time: ${reservation.time}, Adults: ${reservation.num_adults}, Children: ${reservation.num_children || 'N/A'}.`);
+                const message = `You have a reservation on Date: ${reservation.date}, Time: ${reservation.time}, Adults: ${reservation.num_adults || 'N/A'}, Children: ${reservation.num_children || 'N/A'}, Comment: ${reservation.comment || 'None'}`;
+                const alertBox = document.createElement('div');
+                alertBox.className = 'alert alert-info';
+                alertBox.textContent = message;
+                document.body.appendChild(alertBox);
+
+                // Automatically remove the alert after 5 seconds
+                setTimeout(() => {
+                    document.body.removeChild(alertBox);
+                }, 5000);
             });
         }
     </script>
@@ -37,8 +46,11 @@
                             <li>
                                 <strong>Date:</strong> <%= reservation.date %>, 
                                 <strong>Time:</strong> <%= reservation.time %>, 
-                                <strong>Adults:</strong> <%= reservation.num_adults %>, 
+                                <strong>Adults:</strong> <%= reservation.num_adults || 'N/A' %>, 
                                 <strong>Children:</strong> <%= reservation.num_children || 'N/A' %>
+                                <% if (reservation.comment) { %>
+                                    , <strong>Comment:</strong> <%= reservation.comment %>
+                                <% } %>
                             </li>
                         <% }) %>
                     </ul>
@@ -49,9 +61,9 @@
                     <ul>
                         <% cartItems.forEach(item => { %>
                             <li>
-                                <strong>Product:</strong> <%= item.name %>, 
+                                <strong>Product:</strong> <%= item.product_name %>, 
                                 <strong>Quantity:</strong> <%= item.quantity %>, 
-                                <strong>Total:</strong> €<%= item.price * item.quantity %>
+                                <strong>Total:</strong> €<%= (item.total_price || (item.price * item.quantity)).toFixed(2) %>
                             </li>
                         <% }) %>
                     </ul>

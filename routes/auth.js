@@ -1,4 +1,3 @@
-// auth.js
 const express = require("express");
 const router = express.Router();
 const db = require("../data/db");
@@ -14,7 +13,6 @@ router.get("/login", (req, res) => {
         registrationSuccess,
     });
 });
-
 
 // Render Register page
 router.get("/register", (req, res) => {
@@ -62,6 +60,7 @@ router.post("/login", async (req, res) => {
     const { userIdentifier, password } = req.body;
 
     try {
+        // Find the user by username or email
         const [users] = await db.execute(
             "SELECT * FROM users WHERE username = ? OR email = ?",
             [userIdentifier, userIdentifier]
@@ -78,20 +77,40 @@ router.post("/login", async (req, res) => {
             return res.send("Invalid username/email or password.");
         }
 
+        // Save user information in the session
         req.session.user = { id: user.id, username: user.username };
 
+        // Fetch user reservations and cart items from the database
+        const [reservations] = await db.execute(
+            `SELECT
+                DATE_FORMAT(reservation_time, '%Y-%m-%d') AS date,
+                DATE_FORMAT(reservation_time, '%H:%i') AS time,
+                COALESCE(num_adults, 0) AS num_adults,
+                COALESCE(num_children, 0) AS num_children,
+                comment
+             FROM reservations
+             WHERE user_id = ?
+             ORDER BY reservation_time DESC`,
+            [user.id]
+        )
+        const [cartItems] = await db.execute("SELECT * FROM cart_items WHERE user_id = ?", [user.id]);
+
+        // Store reservations and cart items in the session
+        req.session.reservations = reservations;
+        req.session.cartItems = cartItems;
+
+        // Fetch menus and products for the products page
         const [menus] = await db.execute("SELECT * FROM menu");
         const [products] = await db.execute("SELECT * FROM product WHERE approval = 1");
 
         res.render("users/products", {
             user: req.session.user,
-            menus, // Pass menus data
-            products, // Pass products data
-            reservations: [], 
-            cartItems: [], 
+            menus,
+            products,
+            reservations,
+            cartItems,
             selectedMenu: null,
             title: `Welcome back, ${user.username}`,
-
         });
     } catch (err) {
         console.error("Error during login:", err);
@@ -99,13 +118,13 @@ router.post("/login", async (req, res) => {
     }
 });
 
-
 // Logout Route
 router.get("/logout", (req, res) => {
     req.session.destroy(() => {
         res.redirect("/");
     });
 });
+
 // Home route - renders the home page
 router.get("/", async (req, res) => {
     try {
@@ -114,8 +133,8 @@ router.get("/", async (req, res) => {
 
         res.render("users/index", {
             user: req.session.user || null, // Pass the user session or null if not logged in
-            menus, // Pass menus data
-            products, // Pass products data
+            menus,
+            products,
             selectedMenu: null,
             title: "Welcome to Samsa Restaurant",
         });
@@ -124,6 +143,5 @@ router.get("/", async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
-
 
 module.exports = router;
