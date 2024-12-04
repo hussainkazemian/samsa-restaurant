@@ -3,10 +3,15 @@
 <head>
     <%- include('../partials/head') %>
     <script>
+        // Display welcome message only once after login
         function showWelcomeMessage(username) {
-            alert(`Welcome back to Samsa Restaurant, ${username}!`);
+            if (!sessionStorage.getItem("welcomeMessageShown")) {
+                alert(`Welcome back to Samsa Restaurant, ${username}!`);
+                sessionStorage.setItem("welcomeMessageShown", "true");
+            }
         }
 
+        // Show reservation summaries
         function showReservationSummary(reservations) {
             reservations.forEach(reservation => {
                 alert(`You have a reservation on Date: ${reservation.date}, Time: ${reservation.time}, Adults: ${reservation.num_adults}, Children: ${reservation.num_children || 'N/A'}.`);

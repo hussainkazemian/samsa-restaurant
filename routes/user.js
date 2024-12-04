@@ -1,8 +1,14 @@
-//user.js
 const express = require("express");
 const router = express.Router();
 
 const db = require("../data/db");
+
+// Middleware to ensure session data is initialized
+router.use((req, res, next) => {
+    if (!req.session.cart) req.session.cart = [];
+    if (!req.session.reservations) req.session.reservations = [];
+    next();
+});
 
 // Fetch products by menu ID
 router.use("/products/menu/:menuid", async (req, res) => {
@@ -16,7 +22,7 @@ router.use("/products/menu/:menuid", async (req, res) => {
             menus: menus,
             products: products,
             reservations: req.session.reservations || [],
-            cartItems: req.session.cartItems || [],
+            cartItems: req.session.cart || [],
             selectedMenu: menuid,
             title: "Menu Products",
         });
@@ -58,7 +64,7 @@ router.use("/products", async (req, res) => {
             menus: menus,
             products: products,
             reservations: req.session.reservations || [],
-            cartItems: req.session.cartItems || [],
+            cartItems: req.session.cart || [],
             selectedMenu: null,
             title: "All Products",
         });
@@ -74,10 +80,18 @@ router.get("/", async (req, res) => {
         const [products] = await db.execute("SELECT * FROM product WHERE approval = 1 AND homepage = 1");
         const [menus] = await db.execute("SELECT * FROM menu");
 
+        // Fetch reservations for the logged-in user
+        if (req.session.user) {
+            const [reservations] = await db.execute("SELECT * FROM reservations WHERE email = ?", [req.session.user.email]);
+            req.session.reservations = reservations;
+        }
+
         res.render("users/index", {
             user: req.session.user || null,
             menus: menus,
             products: products,
+            reservations: req.session.reservations || [],
+            cartItems: req.session.cart || [],
             selectedMenu: null,
             title: "Welcome to Samsa Restaurant",
         });
@@ -98,10 +112,6 @@ router.post("/cart/add", async (req, res) => {
         const product = products[0];
 
         if (!product) return res.status(404).send("Product not found");
-
-        if (!req.session.cart) {
-            req.session.cart = [];
-        }
 
         const existingItem = req.session.cart.find((item) => item.id === productId);
 

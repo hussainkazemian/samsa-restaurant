@@ -1,4 +1,3 @@
-<!--cart.ejs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,7 +7,12 @@
     <%- include('../partials/nav') %>
 
     <div class="container">
-        <h1>Your Shopping Cart</h1>
+        <% if (user && user.username) { %>
+            <h1>Hello, <%= user.username %>! Your Shopping Cart</h1>
+        <% } else { %>
+            <h1>Your Shopping Cart</h1>
+        <% } %>
+
         <% if (items.length > 0) { %>
             <ul>
                 <% items.forEach(item => { %>
