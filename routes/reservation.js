@@ -28,13 +28,17 @@ router.post("/", async (req, res) => {
             return res.status(400).send("Number of adults is required and must be a valid number.");
         }
 
+        // Insert reservation into database
         await db.execute(
             `INSERT INTO reservations (user_id, fullname, email, num_adults, num_children, reservation_time, comment)
              VALUES (?, ?, ?, ?, ?, ?, ?)`,
             [userId, fullname, email, adultsCount, childrenCount, reservationTime, comment || null]
         );
 
-        req.session.reservationSuccess = `Dear ${fullname}, your reservation is confirmed for ${date} at ${time}.`;
+        // Create confirmation message
+        req.session.reservationSuccess = `Dear ${fullname}, your reservation is confirmed for ${date} at ${time}. A summary of your reservation has been sent to ${email}.`;
+
+        // Redirect to success page
         res.redirect("/reservation/success");
     } catch (error) {
         console.error("Error during reservation:", error);
