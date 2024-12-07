@@ -17,28 +17,53 @@ router.get("/", async (req, res) => {
     try {
         let cartItems = [];
         let totalPrice = 0;
+        let reservations = [];
 
         if (req.session.user) {
+            const userId = req.session.user.id;
+
             // Fetch cart items from the database for the logged-in user
             const [dbCartItems] = await db.execute(
-                `SELECT product_id, product_name, quantity, total_price 
+                `SELECT product_id AS id, product_name AS name, quantity, total_price 
                  FROM cart_items 
                  WHERE user_id = ?`,
-                [req.session.user.id]
+                [userId]
             );
 
-            cartItems = dbCartItems.map(item => ({
-                id: item.product_id,
-                name: item.product_name,
+            cartItems = dbCartItems.map((item) => ({
+                id: item.id,
+                name: item.name,
                 quantity: item.quantity,
-                price: parseFloat(item.total_price) / item.quantity,
+                price: parseFloat(item.total_price) / item.quantity, // Derive price per item
                 total_price: parseFloat(item.total_price),
             }));
 
             totalPrice = cartItems.reduce((sum, item) => sum + item.total_price, 0);
 
+            // Fetch the last 5 reservations for the logged-in user
+            const [dbReservations] = await db.execute(
+                `SELECT 
+                    fullname, 
+                    email, 
+                    num_adults, 
+                    IFNULL(num_children, 0) AS num_children, 
+                    DATE_FORMAT(reservation_time, '%Y-%m-%d %H:%i') AS reservation_time 
+                 FROM reservations 
+                 WHERE user_id = ? 
+                 ORDER BY reservation_time DESC 
+                 LIMIT 5`,
+                [userId]
+            );
+
+            reservations = dbReservations.map((reservation) => ({
+                fullname: reservation.fullname,
+                email: reservation.email,
+                num_adults: reservation.num_adults,
+                num_children: reservation.num_children,
+                reservation_time: reservation.reservation_time,
+            }));
         } else {
-            // Fetch cart items from the session for guest users
+            // Fetch cart items from session for guest users
             cartItems = req.session.cart || [];
             totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
         }
@@ -47,10 +72,11 @@ router.get("/", async (req, res) => {
             user: req.session.user || null,
             items: cartItems,
             totalPrice,
+            reservations, // Pass reservations to the template
         });
-    } catch (error) {
-        console.error("Error fetching cart:", error);
-        res.status(500).send("An error occurred while loading the cart.");
+    } catch (err) {
+        console.error("Error fetching cart:", err);
+        res.status(500).send("Internal server error");
     }
 });
 
