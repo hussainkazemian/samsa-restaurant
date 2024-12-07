@@ -80,7 +80,7 @@ router.post("/login", async (req, res) => {
         req.session.user = { id: user.id, username: user.username };
 
         // Redirect to the cart page or previous page
-        res.redirect("/cart");
+        res.redirect("/products");
     } catch (err) {
         console.error("Error during login:", err);
         res.status(500).render("auth/login", { 
