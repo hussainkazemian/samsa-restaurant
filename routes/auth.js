@@ -8,11 +8,17 @@ const passwordRoutes = require('./password');
 router.use(passwordRoutes);
 
 router.get("/login", (req, res) => {
-    const registrationSuccess = req.session.registrationSuccess || null;
-    req.session.registrationSuccess = null;
+    const resetPasswordMessage = req.session.resetPasswordMessage || null;
+    req.session.resetPasswordMessage = null; // Clear the message after displaying
 
-    res.render("auth/login", { title: "Login", registrationSuccess, errorMessage: null });
+    res.render("auth/login", { 
+        title: "Login", 
+        errorMessage: null, 
+        registrationSuccess: null, 
+        resetPasswordMessage // Pass the message to the template
+    });
 });
+
 
 router.get("/register", (req, res) => {
     res.render("auth/register", { title: "Register" });
@@ -60,7 +66,7 @@ router.post("/login", async (req, res) => {
             return res.render("auth/login", { 
                 title: "Login",
                 errorMessage: "Invalid username/email or password.",
-                registrationSuccess: null
+                registrationSuccess: null,
             });
         }
 
@@ -72,12 +78,15 @@ router.post("/login", async (req, res) => {
             return res.render("auth/login", { 
                 title: "Login",
                 errorMessage: "Invalid username/email or password.",
-                registrationSuccess: null
+                registrationSuccess: null,
             });
         }
 
         // Set session data
         req.session.user = { id: user.id, username: user.username };
+        // Set success message
+        req.session.successMessage = `Welcome back, ${user.username}!`;
+
 
         // Redirect to the cart page or previous page
         res.redirect("/products");
@@ -86,7 +95,7 @@ router.post("/login", async (req, res) => {
         res.status(500).render("auth/login", { 
             title: "Login",
             errorMessage: "An error occurred. Please try again later.",
-            registrationSuccess: null
+            registrationSuccess: null,
         });
     }
 });

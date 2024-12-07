@@ -14,13 +14,22 @@
 
     <div class="container mt-5">
         <h1 class="h3 text-center mb-3">Login</h1>
-    
+
+        <!-- Display Reset Password Success Message -->
+        <% if (resetPasswordMessage) { %>
+            <div class="alert alert-success">
+                <%= resetPasswordMessage %>
+            </div>
+        <% } %>
+
+        <!-- Display Error Message -->
         <% if (errorMessage) { %>
             <div class="alert alert-danger">
                 <%= errorMessage %>
             </div>
         <% } %>
     
+        <!-- Login Form -->
         <form method="POST" action="/login" id="loginForm">
             <div class="mb-3">
                 <label for="userIdentifier" class="form-label">Username or Email</label>

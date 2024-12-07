@@ -1,3 +1,4 @@
+<!--cart.ejs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,22 +8,6 @@
     <%- include('../partials/nav') %>
 
     <div class="container">
-        <!-- Display last 5 reservations for logged-in user -->
-        <% if (user && reservations.length > 0) { %>
-            <h2>Your Recent Reservations</h2>
-            <ul>
-                <% reservations.forEach(reservation => { %>
-                    <li>
-                        <strong>Full Name:</strong> <%= reservation.fullname %> <br>
-                        <strong>Email:</strong> <%= reservation.email %> <br>
-                        <strong>Adults:</strong> <%= reservation.num_adults %>, 
-                        <strong>Children:</strong> <%= reservation.num_children %> <br>
-                        <strong>Reservation Time:</strong> <%= reservation.reservation_time %> <br>
-                    </li>
-                <% }); %>
-            </ul>
-        <% } %>
-
         <h1>Your Shopping Cart</h1>
         <% if (items.length > 0) { %>
             <ul>

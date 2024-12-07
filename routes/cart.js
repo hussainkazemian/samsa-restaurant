@@ -12,12 +12,11 @@ function checkCart(req, res, next) {
 }
 
 router.use(checkCart);
-
+// Remove reservation logic from this route
 router.get("/", async (req, res) => {
     try {
         let cartItems = [];
         let totalPrice = 0;
-        let reservations = [];
 
         if (req.session.user) {
             const userId = req.session.user.id;
@@ -39,31 +38,7 @@ router.get("/", async (req, res) => {
             }));
 
             totalPrice = cartItems.reduce((sum, item) => sum + item.total_price, 0);
-
-            // Fetch the last 5 reservations for the logged-in user
-            const [dbReservations] = await db.execute(
-                `SELECT 
-                    fullname, 
-                    email, 
-                    num_adults, 
-                    IFNULL(num_children, 0) AS num_children, 
-                    DATE_FORMAT(reservation_time, '%Y-%m-%d %H:%i') AS reservation_time 
-                 FROM reservations 
-                 WHERE user_id = ? 
-                 ORDER BY reservation_time DESC 
-                 LIMIT 5`,
-                [userId]
-            );
-
-            reservations = dbReservations.map((reservation) => ({
-                fullname: reservation.fullname,
-                email: reservation.email,
-                num_adults: reservation.num_adults,
-                num_children: reservation.num_children,
-                reservation_time: reservation.reservation_time,
-            }));
         } else {
-            // Fetch cart items from session for guest users
             cartItems = req.session.cart || [];
             totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
         }
@@ -72,13 +47,13 @@ router.get("/", async (req, res) => {
             user: req.session.user || null,
             items: cartItems,
             totalPrice,
-            reservations, // Pass reservations to the template
         });
     } catch (err) {
         console.error("Error fetching cart:", err);
         res.status(500).send("Internal server error");
     }
 });
+
 
 router.get("/cart", async (req, res) => {
     try {

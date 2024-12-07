@@ -54,23 +54,27 @@ router.use("/products/:productid", async function (req, res) {
 
 // Fetch all products
 router.use("/products", async function (req, res) {
+    const successMessage = req.session.successMessage || null; // Retrieve message
+    req.session.successMessage = null; // Clear message after use
 
     try {
-        const [products, ] = await db.execute("select * from product where approval=1");
-        const [menus, ] = await db.execute("select * from menu");
+        const [products, ] = await db.execute("SELECT * FROM product WHERE approval=1");
+        const [menus, ] = await db.execute("SELECT * FROM menu");
        
-        res.render("users/products",{
+        res.render("users/products", {
             title: "All Menus",
             products: products,
-            menus: menus, 
+            menus: menus,
             selectedMenu: null,
-        })
+            successMessage, // Pass message to template
+        });
     } 
     catch (err) {
-        console.log(err);
+        console.error(err);
+        res.status(500).send("Internal server error");
     }
-
 });
+
 
 
 // Home route - renders the home page
