@@ -1,24 +1,20 @@
-<!-- index.ejs -->
+<!--index.ejs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <%- include('../partials/head') %>
 </head>
 <body>
-    <!-- navigation -->
+     <!-- navigation -->
     <%- include('../partials/nav') %>
 
     <div class="container mt-3">
         <div class="row">
             <div class="col-md-3">
-                <%- include('../partials/menu-menu', { menus, selectedMenu }) %>
+                <%- include('../partials/menu-menu', {menus, selectedMenu }) %>
             </div>
             <div class="col-md-9">
-                <% if (user && user.username) { %>
-                    <h1 class="h3 mb-3">Welcome to Samsa Restaurant, <%= user.username %>!</h1>
-                <% } else { %>
-                    <h1 class="h3 mb-3"><%= title %></h1>
-                <% } %>
+                <h1 class="h3 mb-3"> <%= title %> </h1>
 
                 <% if (products.length == 0) { %>
                     <%- include('../partials/no-products') %>
@@ -33,6 +29,7 @@
                 <% if (products.filter(b => b.approval).length > 3) { %>
                     <%- include('../partials/paginations') %>
                 <% } %>
+
             </div>
         </div>
     </div>

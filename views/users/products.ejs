@@ -1,105 +1,42 @@
+<!--products.ejs -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <%- include('../partials/head') %>
-    <script>
-        // Display welcome message only once after login
-        function showWelcomeMessage(username) {
-            if (!sessionStorage.getItem("welcomeMessageShown")) {
-                alert(`Welcome back to Samsa Restaurant, ${username}!`);
-                sessionStorage.setItem("welcomeMessageShown", "true");
-            }
-        }
-
-        // Show reservation summaries with auto-dismiss
-        function showReservationSummary(reservations) {
-            reservations.forEach(reservation => {
-                const message = `You have a reservation on Date: ${reservation.date}, Time: ${reservation.time}, Adults: ${reservation.num_adults || 'N/A'}, Children: ${reservation.num_children || 'N/A'}, Comment: ${reservation.comment || 'None'}`;
-                const alertBox = document.createElement('div');
-                alertBox.className = 'alert alert-info';
-                alertBox.textContent = message;
-                document.body.appendChild(alertBox);
-
-                // Automatically remove the alert after 5 seconds
-                setTimeout(() => {
-                    document.body.removeChild(alertBox);
-                }, 5000);
-            });
-        }
-    </script>
 </head>
 <body>
+   
     <%- include('../partials/nav') %>
 
     <div class="container mt-3">
-        <h1 class="h3 mb-3"><%= title %></h1>
-
-        <!-- Summary Section -->
-        <% if ((reservations && reservations.length > 0) || (cartItems && cartItems.length > 0)) { %>
-            <div class="alert alert-info">
-                <h4>Your Summary</h4>
-
-                <% if (reservations && reservations.length > 0) { %>
-                    <p><strong>Reservations:</strong></p>
-                    <ul>
-                        <% reservations.forEach(reservation => { %>
-                            <li>
-                                <strong>Date:</strong> <%= reservation.date %>, 
-                                <strong>Time:</strong> <%= reservation.time %>, 
-                                <strong>Adults:</strong> <%= reservation.num_adults || 'N/A' %>, 
-                                <strong>Children:</strong> <%= reservation.num_children || 'N/A' %>
-                                <% if (reservation.comment) { %>
-                                    , <strong>Comment:</strong> <%= reservation.comment %>
-                                <% } %>
-                            </li>
-                        <% }) %>
-                    </ul>
-                <% } %>
-
-                <% if (cartItems && cartItems.length > 0) { %>
-                    <p><strong>Cart Items:</strong></p>
-                    <ul>
-                        <% cartItems.forEach(item => { %>
-                            <li>
-                                <strong>Product:</strong> <%= item.product_name %>, 
-                                <strong>Quantity:</strong> <%= item.quantity %>, 
-                                <strong>Total:</strong> €<%= (item.total_price || (item.price * item.quantity)).toFixed(2) %>
-                            </li>
-                        <% }) %>
-                    </ul>
-                <% } %>
-            </div>
-        <% } %>
-
-        <!-- Product and Menu Section -->
         <div class="row">
             <div class="col-md-3">
                 <%- include('../partials/menu-menu', { menus, selectedMenu }) %>
             </div>
             <div class="col-md-9">
-                <% if (products.length === 0) { %>
+                <h1 class="h3 mb-3">
+                    <%= title %>
+                </h1>
+
+                <% if (products.length == 0) { %>
                     <%- include('../partials/no-products') %>
-                <% } else { %>
-                    <% products.forEach(product => { %>
-                        <%- include('../partials/product-card', { product: product, isSingleProduct: false }) %>
-                    <% }) %>
                 <% } %>
+
+                <% products.forEach(product => { %>
+                    <!-- Corrected line: Pass product as an object -->
+                    <%- include('../partials/product-card', { product: product }) %>
+                <% }) %>
+
+                <!-- Pagination (optional, only if needed) -->
+                <% if (products.filter(b => b.approval).length > 3) { %>
+                    <%- include('../partials/paginations') %>
+                <% } %>
+
             </div>
         </div>
     </div>
 
+    <!-- footer -->
     <%- include('../partials/footer') %>
-
-    <!-- User-Specific Pop-Ups -->
-    <% if (user && user.username) { %>
-        <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                showWelcomeMessage("<%= user.username %>");
-                <% if (reservations && reservations.length > 0) { %>
-                    showReservationSummary(<%- JSON.stringify(reservations) %>);
-                <% } %>
-            });
-        </script>
-    <% } %>
 </body>
 </html>

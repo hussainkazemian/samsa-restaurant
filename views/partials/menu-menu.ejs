@@ -1,11 +1,11 @@
 <div class="list-group">
-   <a href="/products" class="list-group-item list-group-item-action">Our Menu</a>
+  <a href="/products" class="list-group-item list-group-item-action">Our Menu</a>
 
-   <% menus.forEach(function (menu) { %>
-       <a href="/products/menu/<%= menu.menuid %>" 
-          class="list-group-item list-group-item-action 
-          <%= selectedMenu == menu.menuid ? 'active' : '' %>">
-           <%= menu.menuname %>
-       </a>
-   <% }) %>
+  <% menus.forEach(function (menu) { %>
+      <a href="/products/menu/<%= menu.menuid %>" 
+         class="list-group-item list-group-item-action 
+         <%= selectedMenu == menu.menuid ? 'active' : '' %>">
+         <%= menu.menuname %>
+      </a>
+  <% }) %>
 </div>

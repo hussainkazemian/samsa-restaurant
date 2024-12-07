@@ -1,7 +1,10 @@
+//routes/reservation.js
+// routes/reservation.js
 const express = require("express");
 const db = require("../data/db");
 const router = express.Router();
 
+// Handle GET request to display the reservation form
 router.get("/", (req, res) => {
     res.render("reservation/reservation", {
         user: req.session.user || null,
@@ -9,7 +12,6 @@ router.get("/", (req, res) => {
         reservations: req.reservations || [], // Dynamically fetched reservations
     });
 });
-
 
 // Handle reservation submission
 router.post("/", async (req, res) => {
@@ -19,9 +21,8 @@ router.post("/", async (req, res) => {
         const userId = req.session.user ? req.session.user.id : null;
         const reservationTime = `${date} ${time}`;
 
-        // Parse adults and children counts
-        const adultsCount = parseInt(num_adults, 10); // Ensure it's a valid integer
-        const childrenCount = num_children ? parseInt(num_children, 10) : null; // Allow null for optional children
+        const adultsCount = parseInt(num_adults, 10);
+        const childrenCount = num_children ? parseInt(num_children, 10) : null;
 
         if (isNaN(adultsCount)) {
             return res.status(400).send("Number of adults is required and must be a valid number.");
@@ -33,9 +34,7 @@ router.post("/", async (req, res) => {
             [userId, fullname, email, adultsCount, childrenCount, reservationTime, comment || null]
         );
 
-        req.session.reservationSuccess = `Dear ${fullname}, your reservation is confirmed for ${date} at ${time}. 
-            A summary of your reservation has been sent to your email address (${email}).`;
-
+        req.session.reservationSuccess = `Dear ${fullname}, your reservation is confirmed for ${date} at ${time}.`;
         res.redirect("/reservation/success");
     } catch (error) {
         console.error("Error during reservation:", error);
@@ -46,7 +45,7 @@ router.post("/", async (req, res) => {
 // Render reservation success page
 router.get("/success", (req, res) => {
     const message = req.session.reservationSuccess || "Reservation completed.";
-    req.session.reservationSuccess = null; // Clear the message
+    req.session.reservationSuccess = null;
     res.render("reservation/success", { message, user: req.session.user || null });
 });
 

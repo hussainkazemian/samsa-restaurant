@@ -1,9 +1,7 @@
 // routes/password.js
 
 const express = require('express');
-const crypto = require('crypto');
-const db = require('../data/db');
-
+const db = require('../data/db'); // Adjust this path if necessary
 const router = express.Router();
 
 // Render forgot password form

@@ -1,8 +1,9 @@
+//cart.js
+
 const express = require('express');
 const router = express.Router();
 const db = require("../data/db");
 
-// Middleware to ensure the cart is initialized in the session
 function checkCart(req, res, next) {
     if (!req.session.cart) {
         req.session.cart = [];
@@ -10,38 +11,40 @@ function checkCart(req, res, next) {
     next();
 }
 
-// Apply middleware to initialize the cart
 router.use(checkCart);
 
-// GET /cart - Display the shopping cart
-// GET /cart - Display the shopping cart
 router.get("/", async (req, res) => {
-    let cartItems = [];
-    let totalPrice = 0;
-
     try {
+        let cartItems = [];
+        let totalPrice = 0;
+
         if (req.session.user) {
-            // Fetch cart items for logged-in users
+            // Fetch cart items from the database for the logged-in user
             const [dbCartItems] = await db.execute(
-                "SELECT product_id, product_name, quantity, total_price FROM cart_items WHERE user_id = ?",
+                `SELECT product_id, product_name, quantity, total_price 
+                 FROM cart_items 
+                 WHERE user_id = ?`,
                 [req.session.user.id]
             );
+
             cartItems = dbCartItems.map(item => ({
-                ...item,
-                total_price: parseFloat(item.total_price), // Ensure total_price is numeric
+                id: item.product_id,
+                name: item.product_name,
+                quantity: item.quantity,
+                total_price: parseFloat(item.total_price),
             }));
+
             totalPrice = cartItems.reduce((sum, item) => sum + item.total_price, 0);
+
         } else {
-            // Use session cart for non-logged-in users
+            // Fetch cart items from the session for guest users
             cartItems = req.session.cart || [];
             totalPrice = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
         }
 
-        // Pass reservations dynamically fetched via middleware (fetchUserData)
         res.render("cart/cart", {
             user: req.session.user || null,
             items: cartItems,
-            reservations: req.reservations || [], // Include reservations in the cart view
             totalPrice,
         });
     } catch (error) {
@@ -51,7 +54,6 @@ router.get("/", async (req, res) => {
 });
 
 
-// POST /cart/add - Add item to the cart
 router.post('/add', async (req, res) => {
     const { product_id, product_name, price, quantity } = req.body;
 
@@ -61,27 +63,27 @@ router.post('/add', async (req, res) => {
 
     try {
         if (req.session.user) {
-            // If user is logged in, save the cart item to the database
+            // If the user is logged in, add the item to the database
+            const userId = req.session.user.id;
+            
             await db.execute(
-                `INSERT INTO cart_items 
-                 (user_id, product_id, product_name, quantity, total_price) 
-                 VALUES (?, ?, ?, ?, ?) 
+                `INSERT INTO cart_items (user_id, product_id, product_name, quantity, total_price)
+                 VALUES (?, ?, ?, ?, ?)
                  ON DUPLICATE KEY UPDATE 
-                 quantity = quantity + ?, 
-                 total_price = total_price + ?`,
+                    quantity = quantity + VALUES(quantity),
+                    total_price = total_price + VALUES(total_price)`,
                 [
-                    req.session.user.id,
+                    userId,
                     product_id,
                     product_name,
                     parseInt(quantity),
-                    parseFloat(price) * parseInt(quantity),
-                    parseInt(quantity),
-                    parseFloat(price) * parseInt(quantity),
+                    parseFloat(price) * parseInt(quantity)
                 ]
             );
+
         } else {
-            // Use session cart for non-logged-in users
-            const existingItem = req.session.cart.find((item) => item.id === product_id);
+            // If the user is not logged in, add the item to the session cart
+            const existingItem = req.session.cart.find(item => item.id === product_id);
 
             if (existingItem) {
                 existingItem.quantity += parseInt(quantity);
@@ -97,14 +99,14 @@ router.post('/add', async (req, res) => {
             }
         }
 
-        res.send({ message: 'Item added to cart', cart: req.session.cart });
+        res.send({ message: 'Item added to cart successfully.' });
     } catch (error) {
         console.error("Error adding item to cart:", error);
         res.status(500).send({ message: "An error occurred while adding the item to the cart." });
     }
 });
 
-// POST /cart/payment - Process payment and clear the cart
+
 router.post('/payment', async (req, res) => {
     const { name, address, card } = req.body;
 
@@ -120,10 +122,8 @@ router.post('/payment', async (req, res) => {
         const totalPrice = items.reduce((sum, item) => sum + (item.total_price || item.price * item.quantity), 0);
 
         if (req.session.user) {
-            // Clear cart in the database
             await db.execute("DELETE FROM cart_items WHERE user_id = ?", [req.session.user.id]);
         } else {
-            // Clear session cart
             req.session.cart = [];
         }
 
