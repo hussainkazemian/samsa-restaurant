@@ -15,20 +15,29 @@ router.post('/forgot-password', async (req, res) => {
 
     try {
         // Check if the user exists
-        const [users] = await db.execute('SELECT * FROM users WHERE email = ?', [email]);
+        const [users] = await db.execute("SELECT * FROM users WHERE email = ?", [email]);
 
         // Simulate sending the reset link regardless of whether the email exists
-        const message = users.length > 0
-            ? `A reset link has been sent to your email address (${email}).`
-            : `A reset link has been sent to your email address (${email}).`;
+        req.session.resetPasswordMessage = `A reset link has been sent to your email address (${email}).`;
 
         // Redirect back to the login page with a success message
-        req.session.resetPasswordMessage = message; // Store the message in session
         res.redirect('/login');
     } catch (err) {
-        console.error('Error during forgot password:', err);
-        res.status(500).send('An error occurred. Please try again.');
+        console.error("Error during forgot password:", err);
+        res.status(500).send("An error occurred. Please try again.");
     }
 });
+
+// Serve forgot password page
+router.get('/forgot-password', (req, res) => {
+    res.render('auth/forgot-password', {
+        title: 'Forgot Password',
+        errorMessage: req.session.errorMessage || null,
+    });
+
+    // Clear session messages after rendering
+    req.session.errorMessage = null;
+});
+
 
 module.exports = router;

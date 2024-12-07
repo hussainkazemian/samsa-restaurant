@@ -6,10 +6,12 @@ const crypto = require('crypto');
 const app = express();
 const reservationRouter = require('./routes/reservation');  // Adjust the path as needed
 
+
 const cartRoutes = require("./routes/cart");
 const userRoutes = require("./routes/user");
 const adminRoutes = require("./routes/admin");
 const authRoutes = require("./routes/auth");
+
 
 const secret = crypto.randomBytes(64).toString('hex');
 console.log('Generated Secret Key:', secret); 

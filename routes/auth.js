@@ -52,6 +52,7 @@ router.post("/register", async (req, res) => {
     }
 });
 // Handle user login
+// Handle user login
 router.post("/login", async (req, res) => {
     const { userIdentifier, password } = req.body;
 
@@ -66,6 +67,7 @@ router.post("/login", async (req, res) => {
             return res.render("auth/login", { 
                 title: "Login",
                 errorMessage: "Invalid username/email or password.",
+                resetPasswordMessage: null, // Ensure this is passed
                 registrationSuccess: null,
             });
         }
@@ -78,27 +80,57 @@ router.post("/login", async (req, res) => {
             return res.render("auth/login", { 
                 title: "Login",
                 errorMessage: "Invalid username/email or password.",
+                resetPasswordMessage: null, // Ensure this is passed
                 registrationSuccess: null,
             });
         }
 
         // Set session data
         req.session.user = { id: user.id, username: user.username };
-        // Set success message
         req.session.successMessage = `Welcome back, ${user.username}!`;
 
-
-        // Redirect to the cart page or previous page
+        // Redirect to the products page
         res.redirect("/products");
     } catch (err) {
         console.error("Error during login:", err);
         res.status(500).render("auth/login", { 
             title: "Login",
             errorMessage: "An error occurred. Please try again later.",
+            resetPasswordMessage: null, // Ensure this is passed
             registrationSuccess: null,
         });
     }
 });
+
+// Serve the login page
+router.get("/login", (req, res) => {
+    res.render("auth/login", {
+        title: "Login",
+        errorMessage: req.session.errorMessage || null,
+        resetPasswordMessage: req.session.resetPasswordMessage || null,
+    });
+
+    // Clear session messages after rendering
+    req.session.errorMessage = null;
+    req.session.resetPasswordMessage = null;
+});
+
+
+// Serve the login page with support for popup error messages
+router.get("/login", (req, res) => {
+    res.render("auth/login", {
+        title: "Login",
+        errorMessage: req.session.errorMessage || null,
+        resetPasswordMessage: req.session.resetPasswordMessage || null,
+    });
+
+    // Clear session messages after rendering
+    req.session.errorMessage = null;
+    req.session.resetPasswordMessage = null;
+});
+
+module.exports = router;
+
 
 
 router.get("/logout", (req, res) => {

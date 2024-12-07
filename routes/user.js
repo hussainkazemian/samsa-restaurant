@@ -10,23 +10,26 @@ const { addToCart, getCart } = require("../shared/cart");// Use shared cart
 // Fetch products by menu ID
 router.use("/products/menu/:menuid", async function(req, res) {
     const id = req.params.menuid;
-    try {
-        const [products, ] = await db.execute("select * from product where menuid=?", [id]);
+    const successMessage = req.session.successMessage || null; // Handle success message
+    req.session.successMessage = null; // Clear the message after using it
 
-        const [menus, ] = await db.execute("select * from menu");
-       
-        res.render("users/products",{
-            title: "All Menus",
+    try {
+        const [products] = await db.execute("SELECT * FROM product WHERE menuid = ?", [id]);
+        const [menus] = await db.execute("SELECT * FROM menu");
+
+        res.render("users/products", {
+            title: "Menu",
             products: products,
             menus: menus,
-            selectedMenu: id
-        })
-    }
-    catch (err){
-        console.log(err);
+            selectedMenu: id,
+            successMessage, // Pass successMessage to the template
+        });
+    } catch (err) {
+        console.error("Error fetching menu products:", err);
         res.status(500).send("Internal server error");
     }
 });
+
 
 // Fetch product details by product ID
 router.use("/products/:productid", async function (req, res) {

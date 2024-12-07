@@ -10,7 +10,7 @@
 
     <div class="container mt-3">
         <!-- Display success message -->
-        <% if (successMessage) { %>
+        <% if (typeof successMessage !== "undefined" && successMessage) { %>
             <div class="alert alert-success">
                 <%= successMessage %>
             </div>
@@ -35,7 +35,7 @@
                 <% }) %>
 
                 <!-- Pagination (optional, only if needed) -->
-                <% if (products.filter(b => b.approval).length > 3) { %>
+                <% if (products.filter(p => p.approval).length > 3) { %>
                     <%- include('../partials/paginations') %>
                 <% } %>
             </div>
