@@ -103,21 +103,44 @@ router.post("/cart/add", async (req, res) => {
 
         if (!product) return res.status(404).send("Product not found");
 
-        if (!req.session.cart) {
-            req.session.cart = [];
-        }
+        // For logged-in users
+        if (req.session.user) {
+            const userId = req.session.user.id;
 
-        const existingItem = req.session.cart.find((item) => item.id === productId);
+            // Add to cart_items table
+            await db.execute(
+                `INSERT INTO cart_items (user_id, product_id, product_name, quantity, total_price)
+                 VALUES (?, ?, ?, ?, ?)
+                 ON DUPLICATE KEY UPDATE 
+                    quantity = quantity + VALUES(quantity),
+                    total_price = total_price + VALUES(total_price)`,
+                [
+                    userId,
+                    productId,
+                    product.productname,
+                    1, // Increment by 1
+                    parseFloat(product.price),
+                ]
+            );
 
-        if (existingItem) {
-            existingItem.quantity += 1;
         } else {
-            req.session.cart.push({
-                id: productId,
-                name: product.productname,
-                price: parseFloat(product.price), // Ensure price is a number
-                quantity: 1,
-            });
+            // For guest users (session-based cart)
+            if (!req.session.cart) {
+                req.session.cart = [];
+            }
+
+            const existingItem = req.session.cart.find((item) => item.id === productId);
+
+            if (existingItem) {
+                existingItem.quantity += 1;
+            } else {
+                req.session.cart.push({
+                    id: productId,
+                    name: product.productname,
+                    price: parseFloat(product.price), // Ensure price is a number
+                    quantity: 1,
+                });
+            }
         }
 
         res.redirect("/cart");
@@ -126,7 +149,6 @@ router.post("/cart/add", async (req, res) => {
         res.status(500).send("Internal server error");
     }
 });
-
 
 
 module.exports = router
