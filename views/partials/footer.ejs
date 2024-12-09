@@ -2,19 +2,20 @@
     <div class="footer-container">
         <!-- Opening Hours Section -->
         <div class="footer-column">
-            <h4>About us!</h4>
+            <h4>About us</h4>
             <h5>We are open:</h5>
             <p>Ma - Su</p>
             <p>10.00 Am - 10.00 Pm</p>
-            <p>📞+358 449857191</p>
-            <p>📧 samsa-restauratn@gmail.com</p>
+            <a href="tel:+3584698548">📞 045874551</a>
+            <p><a href="samsa-restaurant@samsa.com">Email us</a></p>
+
         </div>
 
         <!-- Feane Section (Middle Column) -->
-        <div class="footer-column" style="text-align: justify;">
-            <h3>Samsa Restaurant</h3>
+        <div class="footer-column" style="text-align:justify;">
+            <div class="rest-title" style="text-align: center;"><h3>Samsa Restaurant</h3></div>
             <p>Welcome to Samsa Restaurant! We proudly serve a variety of authentic oriental dishes, preserving their original flavors. 
-                Established in 2024, we are dedicated to creating a warm and inviting dining experience for you, your family, and friends. Feel free to contact us with any questions.
+                Established in 2024, we are dedicated to creating a warm and inviting dining experience for you, your family, and friends. <br> Feel free to contact us with any questions. </br>
                 we are here to serve you!</p>
             <div class="social-icons">
                 <a href="https://www.facebook.com/yasin1123" class="social-icon"><i class="fab fa-facebook"></i></a>
@@ -26,16 +27,39 @@
         </div>
 
         <!-- Contact Us Section -->
-        <div class="footer-column">
-            <h3>We are here!</h3>
-            <Address>Espoontie 1, Samsa Restaurant</Address> 
+<div class="footer-column">
+    <h3>We are here!</h3>
+    <address>Espoontie 1, Samsa Restaurant</address>
 
-            <div id="map"></div>
-        </div>
+    <!-- Map Container -->
+    <div id="map"></div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // Initialize the map
+        const map = L.map('map').setView([60.2094547, 24.636299], 17); // Set view with latitude, longitude, and zoom level
+
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Add a marker at the address location
+        L.marker([60.2094547, 24.636299]).addTo(map)
+            .bindPopup("<b>Espoontie 1</b><br>Samsa Restaurant")
+            .openPopup();
+    });
+</script>
+
+        
     </div>
     <div class="footer-bottom">
         <p>© 2024 All Rights Reserved By-Yasin & Hussain</p>
         <p>© Distributed By Runner</p>
     </div>
+    
 </footer>
 <script src="/js/footer-map.js"></script>
+

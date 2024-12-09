@@ -29,13 +29,52 @@ footer {
     flex: 1;
     margin: 10px;
     min-width: 200px;
-}
-
-.footer-column {
     font-size: 1.2em;
     margin-bottom: 10px;
 }
 
+
+
+/* For screens 990px and smaller */
+@media (max-width: 990px) {
+    .footer-container {
+        gap: 100px; /* Reduce the gap between columns */
+        padding: 0 20px; /* Adjust padding for smaller screens */
+    }
+
+    .footer-column {
+        font-size: 1em; /* Reduce font size */
+        margin-bottom: 15px; /* Increase spacing between columns */
+    }
+}
+
+/* For screens 768px and smaller (tablets) */
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column; /* Stack columns vertically */
+        align-items: center; /* Center the columns */
+        gap: 50px; /* Further reduce the gap */
+    }
+
+    .footer-column {
+        font-size: 1em; /* Maintain smaller font size */
+        text-align: center; /* Center align text */
+    }
+}
+
+/* For screens 576px and smaller (phones) */
+@media (max-width: 576px) {
+    .footer-container {
+        padding: 0 10px; /* Further reduce padding */
+        gap: 20px; /* Minimal gap */
+    }
+
+    .footer-column {
+        font-size: 0.9em; /* Further reduce font size */
+        margin-bottom: 10px; /* Maintain spacing */
+        text-align: center; /* Center align text */
+    }
+}
 .footer-column p {
     font-size: 0.9em;
     line-height: 1.6;
@@ -48,8 +87,8 @@ footer {
 }
 
 .social-icon {
-    color: #fff;
-    font-size: 1.5em;
+    color: #1859d2;
+    font-size: 1.8em;
     text-decoration: none;
     transition: color 0.3s;
 }
@@ -125,6 +164,15 @@ nav ul li {
     margin-left: 75px;
 
 }
+/* Medium screens (tablets, 768px and up) */
+@media (max-width: 990px) {
+    .navbar-nav, .nav-link {
+        color: #3ecc5f; /* Change to black for medium screens */
+    }
+}
+
+
+
 .navbar{
     display: flex; 
     justify-content: space-between; 
@@ -372,10 +420,15 @@ textarea {
     --bs-alert-bg: #b8e2e169;
     /* --bs-alert-border-color: var(--bs-success-border-subtle); */
     --bs-alert-link-color: var(--bs-success-text-emphasis);
+  
 }
 .bg-success {
     --bs-bg-opacity: 1;
     background-color: rgb(190, 209, 215) !important;
+    --bs-badge-color: #0f527f;
+}
+.alert-danger{
+    --bs-alert-border-color:#d1e7dd var(--bs-success-border-subtle);
 }
 
 .list-group{
