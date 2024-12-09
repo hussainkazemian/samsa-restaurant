@@ -446,17 +446,12 @@ textarea {
     background-color: #f1f1f1;
     border-radius: 10px;
 }
-
-/* .col-md-12{
-    width: 100%; 
-    height: 100%; 
-    display: block; 
-    border: none; 
-    border-radius: 0;
-    box-sizing: border-box; 
-    text-align: right; 
-
-} */
+/* 
+ .col-md-12{
+   margin: auto;
+    display: block;
+    padding: auto;
+}  */
 .container.mt-3{
 margin-bottom: -80px;
 }
@@ -469,3 +464,4 @@ margin-bottom: -80px;
 
 
 }
+
