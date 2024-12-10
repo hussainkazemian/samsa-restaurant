@@ -132,3 +132,158 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2024-11-26 14:04:33
+
+
+DROP TABLE IF EXISTS `cart_items`;
+
+CREATE TABLE `cart_items` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `product_name` varchar(255) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `total_price` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `cart_items_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `cart_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `product` (`productid`) ON DELETE CASCADE
+)
+
+
+DROP TABLE IF EXISTS `menu`;
+
+CREATE TABLE `menu` (
+  `menuid` int(11) NOT NULL AUTO_INCREMENT,
+  `menuname` varchar(100) NOT NULL,
+  PRIMARY KEY (`menuid`),
+  UNIQUE KEY `menuid_UNIQUE` (`menuid`)
+) 
+
+CREATE TABLE `password_resets` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `expires_at` datetime NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `token` (`token`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `password_resets_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+)
+
+DROP TABLE IF EXISTS `reservations`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `reservations` (
+  `reservation_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `fullname` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `num_adults` int(11) NOT NULL DEFAULT 0,
+  `num_children` int(11) DEFAULT NULL,
+  `reservation_time` datetime NOT NULL,
+  `comment` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`reservation_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `reservations_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+)
+
+-- Import Script for `samsa_restaurant_app`
+CREATE DATABASE IF NOT EXISTS samsa_restaurant_app;
+USE samsa_restaurant_app;
+
+-- Create tables and populate data
+DROP TABLE IF EXISTS `cart_items`;
+CREATE TABLE `cart_items` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `product_id` int(11) NOT NULL,
+  `product_name` varchar(255) NOT NULL,
+  `quantity` int(11) NOT NULL,
+  `total_price` decimal(10,2) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `user_id` (`user_id`),
+  KEY `product_id` (`product_id`),
+  CONSTRAINT `cart_items_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `cart_items_ibfk_2` FOREIGN KEY (`product_id`) REFERENCES `product` (`productid`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+DROP TABLE IF EXISTS `menu`;
+CREATE TABLE `menu` (
+  `menuid` int(11) NOT NULL AUTO_INCREMENT,
+  `menuname` varchar(100) NOT NULL,
+  PRIMARY KEY (`menuid`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+
+INSERT INTO `menu` VALUES
+(1,'Main Dishes'),
+(2,'Kebabs'),
+(3,'Vegetarian Dishes'),
+(4,'Appetizers'),
+(5,'Drinks');
+
+DROP TABLE IF EXISTS `password_resets`;
+CREATE TABLE `password_resets` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `token` varchar(255) NOT NULL,
+  `expires_at` datetime NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `token` (`token`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `password_resets_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+INSERT INTO `password_resets` VALUES
+(1,5,'a7a79dafd961b553c523ec47bf367747b1ce198538bfc43cd5baea2b0a01519f','2024-12-04 14:00:30','2024-12-04 11:00:30'),
+(2,4,'113567574a051332ab25638c6d1bdd4384a447ff8606b77086394dd485d7d2c8','2024-12-04 14:08:39','2024-12-04 11:08:39');
+
+DROP TABLE IF EXISTS `product`;
+CREATE TABLE `product` (
+  `productid` int(11) NOT NULL AUTO_INCREMENT,
+  `productname` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `image` varchar(45) DEFAULT NULL,
+  `homepage` tinyint(1) DEFAULT 0,
+  `approval` tinyint(1) DEFAULT 0,
+  `price` decimal(10,2) DEFAULT NULL,
+  `menuid` int(11) NOT NULL,
+  PRIMARY KEY (`productid`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1;
+
+INSERT INTO `product` VALUES
+(1,'Big Plate Chicken','Hand-pulled Linguine, Marinated Bone-in Chicken, Potato, Onion, Mix Peppers, Chilli, Soy Sauce.','6.jpeg',0,1,29.55,1),
+(2,'Lamb Kebab - xxd','Chunks of lamb marinated in cumin and house spices and served on a skewer.','2.jpg',0,1,7.35,2);
+
+DROP TABLE IF EXISTS `reservations`;
+CREATE TABLE `reservations` (
+  `reservation_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) DEFAULT NULL,
+  `fullname` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `num_adults` int(11) NOT NULL DEFAULT 0,
+  `num_children` int(11) DEFAULT NULL,
+  `reservation_time` datetime NOT NULL,
+  `comment` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`reservation_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=latin1;
+
+INSERT INTO `reservations` VALUES
+(1,NULL,'mrai','maria@gmail.com',2,2,'2000-12-12 12:00:00','nothing','2024-12-04 09:36:25');
+
+DROP TABLE IF EXISTS `users`;
+CREATE TABLE `users` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` varchar(255) NOT NULL,
+  `email` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1;
+
+INSERT INTO `users` VALUES
+(1,'urumci','jasiin358@gmail.com','$2b$10$yGatB6LR6Agga5s140eLpOzmif3FbS8UXwtjzctyXQgu4vLni6z.G','2024-11-25 19:51:17');
