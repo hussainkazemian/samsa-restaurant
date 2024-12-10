@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "npx nodemon index.js",
-    "lint:ejs": "node lint-ejs.js"
+    "lint:ejs": "node lint-ejs.js",
+    "test": "playwright test"
   },
   "author": "",
   "license": "ISC",
@@ -26,6 +26,8 @@
     "nodemon": "^3.1.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "@types/node": "^22.10.1",
     "ejs-lint": "^2.0.1"
   }
 }

@@ -15,7 +15,7 @@ router.get("/login", (req, res) => {
         title: "Login", 
         errorMessage: null, 
         registrationSuccess: null, 
-        resetPasswordMessage // Pass the message to the template
+        resetPasswordMessage 
     });
 });
 
@@ -51,7 +51,6 @@ router.post("/register", async (req, res) => {
         res.status(500).send("An error occurred. Please try again later.");
     }
 });
-// Handle user login
 // Handle user login
 router.post("/login", async (req, res) => {
     const { userIdentifier, password } = req.body;
@@ -129,7 +128,6 @@ router.get("/login", (req, res) => {
     req.session.resetPasswordMessage = null;
 });
 
-module.exports = router;
 
 
 
